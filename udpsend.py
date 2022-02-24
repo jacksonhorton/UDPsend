@@ -8,7 +8,7 @@ from traceback import print_tb
 # Contains all settings so they can be accessed from any scope, good job[thumbs up]
 class settings:
     # constants
-    DEBUG_MODE = False
+    DEBUG_MODE = True
     BG_COLOR = '#353535'
     DISABLED_COLOR = '#535353'
     TXT_COLOR = '#FFFFFF'
@@ -233,7 +233,8 @@ def saveDataToFile(name, dataToSave, frame):
     settings.SAVES.clear()
     updateConf()
     Load1.delete(0, END)
-    Load1.insert(0, *settings.SAVES)
+    for save in settings.SAVES:
+        Load1.insert(END, save[0])
 
     # closes window
     frame.destroy()
