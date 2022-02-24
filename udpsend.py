@@ -8,7 +8,7 @@ from traceback import print_tb
 # Contains all settings so they can be accessed from any scope, good job[thumbs up]
 class settings:
     # constants
-    DEBUG_MODE = True
+    DEBUG_MODE = False
     BG_COLOR = '#353535'
     DISABLED_COLOR = '#535353'
     TXT_COLOR = '#FFFFFF'
@@ -17,7 +17,7 @@ class settings:
     IP_DEFAULT = ''
     MSG_DEFAULT = ''
     PORT_DEFAULT = 5000
-    USE_SAVES = False
+    USE_SAVES = True
     SAVES = []
 
     if DEBUG_MODE:
@@ -87,7 +87,6 @@ def updateConf():
 
 
 def udpCall():
-    print('jsdbfgskjfb')
     # gets ip address from frame
     ip = E1.get()
     # if the ip field is empty, default ip address to 127.0.0.1 to avoid errors
@@ -303,10 +302,10 @@ CheckVar2 = BooleanVar()
 
 # On and Off checkboxes for message. One of these can be used instead of the message entry field
 onCHECK = Checkbutton(entryFrame, text="On", variable=CheckVar1, onvalue=True, offvalue=False,
-                      bg=settings.BG_COLOR, fg=settings.TXT_COLOR, command=lambda: onCheckClear())
+                      bg=settings.BG_COLOR, fg=settings.TXT_COLOR, selectcolor=settings.BG_COLOR, command=lambda: onCheckClear())
 onCHECK.grid(row=2, column=1)
 offCHECK = Checkbutton(entryFrame, text="Off", variable=CheckVar2, onvalue=True, offvalue=False,
-                       bg=settings.BG_COLOR, fg=settings.TXT_COLOR, command=lambda: offCheckClear())
+                       bg=settings.BG_COLOR, fg=settings.TXT_COLOR, selectcolor=settings.BG_COLOR, command=lambda: offCheckClear())
 offCHECK.grid(row=2, column=2)
 
 # Message label and entry
