@@ -1,14 +1,14 @@
 # udpsend.py
 import socket
-from tkinter import Tk, Button, LabelFrame, Label, Entry, BooleanVar, Checkbutton, Listbox, END, Toplevel, Text
+from tkinter import Tk, Button, LabelFrame, Label, Entry, BooleanVar, Checkbutton, Listbox, END, Toplevel, Text, Menu, IntVar
 import os
-from traceback import print_tb
 
 
 # Contains all settings so they can be accessed from any scope, good job[thumbs up]
 class settings:
     # constants
     DEBUG_MODE = False
+    DARK_MODE = True
     BG_COLOR = '#353535'
     DISABLED_COLOR = '#535353'
     TXT_COLOR = '#FFFFFF'
@@ -17,7 +17,7 @@ class settings:
     IP_DEFAULT = ''
     MSG_DEFAULT = ''
     PORT_DEFAULT = 5000
-    USE_SAVES = True
+    USE_SAVES = False
     SAVES = []
 
     if DEBUG_MODE:
@@ -35,9 +35,11 @@ def updateConf():
         for conf in confEntries:
             if conf[0].upper() == 'DARK_MODE':
                 if conf[1].upper() == 'TRUE':   # dark mode
+                    settings.DARK_MODE = True
                     settings.BG_COLOR = '#353535'
                     settings.TXT_COLOR = '#FFFFFF'
                 else:   # light mode
+                    settings.DARK_MODE = False
                     settings.BG_COLOR = '#FFFFFF'
                     settings.TXT_COLOR = '#000000'
             # transparency factor, 1.0 is solid, 0.0 is transparent
@@ -257,6 +259,24 @@ def deleteSave():
 
 
 
+def openSettings():
+    settingsFrame = Toplevel(bg=settings.BG_COLOR)
+
+    # dark mode checkbox
+    darkModeCheckValue = BooleanVar()
+    darkModeCheck = Checkbutton(settingsFrame, text="Dark Mode", variable=darkModeCheckValue,
+                        bg=settings.BG_COLOR, fg=settings.TXT_COLOR, selectcolor=settings.BG_COLOR)
+    if settings.DARK_MODE is True:
+        darkModeCheckValue.set(True)
+        # darkModeCheck.setvar(True)
+    darkModeCheck.grid(row=1, column=1, padx=15, pady=15)
+    # use_saves checkbox
+    useSavesCheckValue = BooleanVar()
+    useSavesCheck = Checkbutton(settingsFrame, text="Use Saves", variable=useSavesCheckValue, onvalue=True, offvalue=False,
+                            bg=settings.BG_COLOR, fg=settings.TXT_COLOR, selectcolor=settings.BG_COLOR)
+    useSavesCheck.grid(row=2, column=1)
+
+
 # Does pre-window loading stuff
 updateConf()
 
@@ -345,11 +365,20 @@ if settings.USE_SAVES:
     loadBTN.grid(row=2, column=5, padx=8, pady=8)
 
     # Save save button, a little confusing, but it's ok
-    saveBTN = Button(top, text="Save", padx=4, pady=4,
-                     command=lambda: saveSave())
+    saveBTN = Button(top, text="Save", padx=4, pady=4, command=lambda: saveSave())
     saveBTN.grid(row=2, column=6, padx=8, pady=8)
 
 
+# menubar initialization
+menuBar = Menu(top)
+fileMenu = Menu(menuBar, tearoff=False)
+
+# add commands to fileMenu
+fileMenu.add_command(label="Settings", command=lambda: openSettings())
+
+# adds all submenus to menu bar
+menuBar.add_cascade(label="File", menu=fileMenu)
 
 # starts window loop
+top.config(menu=menuBar)
 top.mainloop()
