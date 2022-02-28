@@ -1,7 +1,10 @@
 # udpsend.py
+from logging import PlaceHolder
 import socket
 from tkinter import Tk, Button, LabelFrame, Label, Entry, BooleanVar, Checkbutton, Listbox, END, Toplevel, Text, Menu, IntVar
 import os
+
+from pyparsing import col
 
 
 # Contains all settings so they can be accessed from any scope, good job[thumbs up]
@@ -70,6 +73,8 @@ def updateConf():
                         with open(os.path.join(settings.PATH, 'saves', file), 'r') as fileLine:
                             arg = fileLine.readline().split(',', 2)
                             settings.SAVES.append([file, arg])
+                else:
+                    settings.USE_SAVES = False
 
     else:   # config file or dir doesn't exist
         # if conf directory doesn't exits
@@ -241,6 +246,19 @@ def saveDataToFile(name, dataToSave, frame):
     frame.destroy()
 
 
+def saveConfigToFile(dark, saves, defaultValue, frame):
+    # opens a file with the given name and writes the save data to the *hopefully* loadable file
+    with open(os.path.join(settings.PATH, 'config.txt'), 'w') as saveFile:
+        saveFile.write(f'DARK_MODE={dark}\nUSE_SAVES={saves}\nDEFAULT={defaultValue}')
+    print(f'>Saving: DARK_MODE={dark}\nUSE_SAVES={saves}\nDEFAULT={defaultValue}')
+
+    updateConf()
+
+    # closes window
+    frame.destroy()
+    top.destroy()
+
+
 def deleteSave():
     # if no save is selected, this catches error
     try:
@@ -264,17 +282,62 @@ def openSettings():
 
     # dark mode checkbox
     darkModeCheckValue = BooleanVar()
-    darkModeCheck = Checkbutton(settingsFrame, text="Dark Mode", variable=darkModeCheckValue,
+    if settings.DARK_MODE:
+        darkModeCheckValue.set(True)    # checked
+
+    darkModeCheck = Checkbutton(settingsFrame, variable=darkModeCheckValue, text="Dark Mode",
                         bg=settings.BG_COLOR, fg=settings.TXT_COLOR, selectcolor=settings.BG_COLOR)
-    if settings.DARK_MODE is True:
-        darkModeCheckValue.set(True)
-        # darkModeCheck.setvar(True)
-    darkModeCheck.grid(row=1, column=1, padx=15, pady=15)
+    darkModeCheck.grid(row=1, column=1, padx=10, pady=5)
+
+
     # use_saves checkbox
     useSavesCheckValue = BooleanVar()
-    useSavesCheck = Checkbutton(settingsFrame, text="Use Saves", variable=useSavesCheckValue, onvalue=True, offvalue=False,
-                            bg=settings.BG_COLOR, fg=settings.TXT_COLOR, selectcolor=settings.BG_COLOR)
-    useSavesCheck.grid(row=2, column=1)
+    if settings.USE_SAVES:
+        useSavesCheckValue.set(True)    # checked
+
+    useSavesCheck = Checkbutton(settingsFrame, text="Use Saves", variable=useSavesCheckValue, 
+                                bg=settings.BG_COLOR, fg=settings.TXT_COLOR, selectcolor=settings.BG_COLOR)
+    useSavesCheck.grid(row=2, column=1, padx=10, pady=5)
+
+
+    # def label
+    defL = Label(settingsFrame, text="Default Values",
+                 bg=settings.BG_COLOR, fg=settings.TXT_COLOR)
+    defL.grid(row=3, column=1)
+    # def ip entry
+    defIpE = Entry(settingsFrame, bd=1, bg=settings.BG_COLOR, width=15,
+                   fg=settings.TXT_COLOR, disabledbackground=settings.DISABLED_COLOR)
+    defIpE.grid(row=3, column=2, padx=10, pady=5)
+    # def msg entry
+    defMsgE = Entry(settingsFrame, bd=1, bg=settings.BG_COLOR, width=15,
+                   fg=settings.TXT_COLOR, disabledbackground=settings.DISABLED_COLOR)
+    defMsgE.grid(row=4, column=2, padx=10, pady=5)
+    # def port entry
+    defPortE = Entry(settingsFrame, bd=1, bg=settings.BG_COLOR, width=15,
+                   fg=settings.TXT_COLOR, disabledbackground=settings.DISABLED_COLOR)
+    defPortE.grid(row=5, column=2, padx=10, pady=5)
+
+    # sets default entry values to what is stored in settings class
+    defIpE.insert(0, settings.IP_DEFAULT)
+    defMsgE.insert(0, settings.MSG_DEFAULT)
+    defPortE.insert(0, settings.PORT_DEFAULT)
+
+    # Button that saves the dataToSave[] and name to a file
+    saveConfBTN = Button(settingsFrame, text="Save and Close", padx=4, pady=4,
+                     command=lambda: saveConfigToFile(darkModeCheckValue.get(),
+                                                      useSavesCheckValue.get(),
+                                                      f'{defIpE.get()},{defMsgE.get()},{defPortE.get()}',
+                                                    settingsFrame)
+                     )
+    saveConfBTN.grid(row=6, column=1, padx=8, pady=8)
+
+    # cancel button, closes save window
+    cancelBTN = Button(settingsFrame, text="Cancel", padx=4,
+                       pady=4, command=settingsFrame.destroy)
+    cancelBTN.grid(row=6, column=2, padx=8, pady=8)
+
+
+    settingsFrame.mainloop()
 
 
 # Does pre-window loading stuff
