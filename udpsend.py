@@ -1,10 +1,7 @@
 # udpsend.py
-from logging import PlaceHolder
 import socket
 from tkinter import Tk, Button, LabelFrame, Label, Entry, BooleanVar, Checkbutton, Listbox, END, Toplevel, Text, Menu, IntVar
 import os
-
-from pyparsing import col
 
 
 # Contains all settings so they can be accessed from any scope, good job[thumbs up]
@@ -417,6 +414,10 @@ if settings.USE_SAVES:
     Load1 = Listbox(loadFrame, bg=settings.BG_COLOR,
                     selectmode='single', fg=settings.TXT_COLOR, height=8)
     # Load1.insert(END, *settings.SAVES)
+    
+    # deselcts save when focus moved from loadbox, prevent accidental save deletion
+    Load1.bind('<FocusOut>', lambda e: Load1.selection_clear(0, END))
+    
     for save in settings.SAVES:
         Load1.insert(END, save[0])
     Load1.grid(row=1, column=1)
